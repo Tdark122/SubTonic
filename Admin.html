@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a22;--card:#191236;--line:#2e2559;--tx:#f4f1ff;--mut:#a097cf;--a:#7c5cff;--a2:#22d3b6}
+*{box-sizing:border-box;margin:0}
+body{font-family:Sora,system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+button,input,select{font:inherit;color:inherit}
+.hide{display:none!important}
+input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:#120d2b;margin:6px 0 12px;outline:0}
+select option{background:#120d2b}
+label{font-size:13px;color:var(--mut)}
+.btn{border:0;border-radius:10px;padding:12px 18px;font-weight:600;cursor:pointer;background:var(--a);white-space:nowrap}
+.btn.g{background:#12805f}.btn.r{background:#a12a3d}.btn.o{background:var(--card);border:1px solid var(--line)}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 5vw;border-bottom:1px solid var(--line);position:sticky;top:0;background:#0e0a22ee;z-index:5}
+.logo{font-weight:800;font-size:20px}.logo small{color:var(--a2);font-weight:600;font-size:13px;margin-left:8px}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 5vw 80px}
+nav{display:flex;gap:8px;margin-bottom:20px;overflow-x:auto}
+nav button{border:1px solid var(--line);background:var(--card);padding:10px 18px;border-radius:99px;cursor:pointer;color:var(--mut);font-weight:600;white-space:nowrap}
+nav button.on{background:var(--a);color:#fff;border-color:var(--a)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.row:last-child{border:0}
+.row small{color:var(--mut)}
+.acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.acts input{width:110px;margin:0;padding:9px 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.login{max-width:380px;margin:12vh auto;padding:0 20px}
+.tag{padding:3px 10px;border-radius:99px;font-size:12px;background:#3a2f70}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#fff;color:#1b1340;padding:12px 22px;border-radius:99px;font-weight:600;z-index:9}
+</style></head><body>
+
+<div id="lg" class="login"><div class="card"><div class="logo" style="margin-bottom:16px">Admin login</div>
+<label>Admin email</label><input id="em" type="email"><label>Password</label><input id="pw" type="password">
+<p id="er" style="color:#ff7b8a;font-size:13px;min-height:20px"></p><button class="btn" id="go" style="width:100%">Log in</button></div></div>
+
+<div id="ap" class="hide">
+<header><div class="logo"><span id="sn">SubTonic</span><small>Admin</small></div><button class="btn o" id="out">Log out</button></header>
+<div class="wrap">
+ <nav><button data-t="dep" class="on">Deposits</button><button data-t="pl">Plans &amp; prices</button><button data-t="ord">Orders</button><button data-t="set">Settings</button></nav>
+
+ <div id="dep"><div class="card"><h3>Pending deposits</h3><div id="dl"></div></div><div class="card"><h3>Recent deposits</h3><div id="dh"></div></div></div>
+
+ <div id="pl" class="hide">
+  <div class="card"><h3 style="margin-bottom:10px">Add a plan</h3><div class="grid">
+   <div><label>Network</label><select id="pn"><option>MTN</option><option>Airtel</option><option>Glo</option></select></div>
+   <div><label>Plan name</label><input id="pm" placeholder="e.g. 1GB (30 days)"></div>
+   <div><label>Your price (₦)</label><input id="pp" type="number"></div>
+   <div><label>API plan code</label><input id="pc" placeholder="from API docs"></div></div>
+   <button class="btn" id="addp">Add plan</button></div>
+  <div class="card" id="plist"></div></div>
+
+ <div id="ord" class="hide"><div class="card" id="ol"></div></div>
+
+ <div id="set" class="hide"><div class="card" style="max-width:520px"><h3 style="margin-bottom:10px">Website settings</h3>
+  <label>Website name</label><input id="s1"><label>Bank name</label><input id="s2"><label>Account number</label><input id="s3"><label>Account name</label><input id="s4"><label>Minimum deposit (₦)</label><input id="s5" type="number">
+  <button class="btn" id="sv">Save settings</button></div></div>
+</div></div>
+<div id="toast" class="hide"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// ====== PASTE YOUR FIREBASE CONFIG HERE (same as index.html) ======
+const FIREBASE_CONFIG={apiKey:"AIzaSyC4xb59rh3GVEh9BEzOfF6CG5uu3VHv_Wg",authDomain:"pay-bfba2.firebaseapp.com",projectId:"pay-bfba2",storageBucket:"pay-bfba2.firebasestorage.app",messagingSenderId:"145331241096",appId:"1:145331241096:web:39bd6339ae2a8fdd5e5f3d"};
+const ADMIN_EMAIL="your-admin-email@gmail.com"; // only this account can enter the admin page
+// ==================================================================
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth=firebase.auth(),db=firebase.firestore(),$=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const ng=n=>'₦'+Number(n||0).toLocaleString();let unsubs=[];
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.remove('hide');setTimeout(()=>e.classList.add('hide'),2800)}
+$('#go').onclick=async()=>{$('#er').textContent='';try{await auth.signInWithEmailAndPassword($('#em').value.trim(),$('#pw').value)}catch(e){$('#er').textContent=e.message.replace('Firebase: ','')}};
+$('#out').onclick=()=>auth.signOut();
+$$('nav button').forEach(b=>b.onclick=()=>{['dep','pl','ord','set'].forEach(x=>$('#'+x).classList.toggle('hide',x!=b.dataset.t));$$('nav button').forEach(y=>y.classList.toggle('on',y==b))});
+
+auth.onAuthStateChanged(u=>{unsubs.forEach(f=>f());unsubs=[];
+ if(u&&u.email!==ADMIN_EMAIL){$('#er').textContent='This account is not an admin.';auth.signOut();return}
+ $('#lg').classList.toggle('hide',!!u);$('#ap').classList.toggle('hide',!u);if(!u)return;
+ db.doc('settings/site').get().then(d=>{const s=d.data()||{name:'SubTonic',bank:'Opay',acct:'7037392295',acctName:'Edewor oritsegbemi ubido',min:300};
+  $('#sn').textContent=s.name;$('#s1').value=s.name;$('#s2').value=s.bank;$('#s3').value=s.acct;$('#s4').value=s.acctName;$('#s5').value=s.min});
+ unsubs.push(db.collection('deposits').onSnapshot(s=>{const a=s.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>y.time-x.time);
+  $('#dl').innerHTML=a.filter(d=>d.status=='pending').map(d=>`<div class="row"><div><b>${ng(d.amount)}</b> <span class="tag">${d.ref}</span><br><small>${d.name} · ${d.email}<br>${new Date(d.time).toLocaleString()}</small></div><div class="acts"><button class="btn g" onclick="approve('${d.id}')">Approve</button><button class="btn r" onclick="reject('${d.id}')">Reject</button></div></div>`).join('')||'<small>No pending deposits.</small>';
+  $('#dh').innerHTML=a.filter(d=>d.status!='pending').slice(0,30).map(d=>`<div class="row"><div>${ng(d.amount)} <small>${d.email} · ${d.ref}</small></div><span class="tag">${d.status}</span></div>`).join('')||'<small>Nothing yet.</small>'}));
+ unsubs.push(db.collection('plans').onSnapshot(s=>{const a=s.docs.map(d=>({id:d.id,...d.data()})).sort((x,y)=>x.network.localeCompare(y.network)||x.price-y.price);
+  $('#plist').innerHTML=a.map(p=>`<div class="row"><div><b>${p.network}</b> ${p.name}<br><small>API code: ${p.apiCode||'-'}</small></div><div class="acts"><input id="pr${p.id}" type="number" value="${p.price}"><button class="btn" onclick="savePrice('${p.id}')">Save</button><button class="btn r" onclick="delPlan('${p.id}')">Delete</button></div></div>`).join('')||'<small>No plans yet. Add one above.</small>'}));
+ unsubs.push(db.collection('orders').onSnapshot(s=>{const a=s.docs.map(d=>d.data()).sort((x,y)=>y.time-x.time).slice(0,50);
+  $('#ol').innerHTML=a.map(o=>`<div class="row"><div>${o.network} ${o.plan} to <b>${o.phone}</b><br><small>${o.email} · ${new Date(o.time).toLocaleString()}</small></div><div style="text-align:right">${ng(o.price)}<br><span class="tag">${o.status}</span></div></div>`).join('')||'<small>No orders yet.</small>'}))});
+
+async function approve(id){try{const r=db.doc('deposits/'+id);await db.runTransaction(async t=>{const d=await t.get(r);if(d.data().status!='pending')throw{message:'Already handled'};
+  const ur=db.doc('users/'+d.data().uid),u=await t.get(ur);t.update(ur,{balance:(u.data().balance||0)+d.data().amount});t.update(r,{status:'approved'})});toast('Approved, wallet credited')}catch(e){toast(e.message)}}
+const reject=id=>db.doc('deposits/'+id).update({status:'rejected'}).then(()=>toast('Rejected'));
+$('#addp').onclick=async()=>{const p=Number($('#pp').value),n=$('#pm').value.trim();if(!n||!p)return toast('Enter plan name and price');
+ await db.collection('plans').add({network:$('#pn').value,name:n,price:p,apiCode:$('#pc').value.trim()});$('#pm').value=$('#pp').value=$('#pc').value='';toast('Plan added')};
+const savePrice=id=>db.doc('plans/'+id).update({price:Number($('#pr'+id).value)}).then(()=>toast('Price updated'));
+const delPlan=id=>confirm('Delete this plan?')&&db.doc('plans/'+id).delete();
+$('#sv').onclick=()=>db.doc('settings/site').set({name:$('#s1').value.trim(),bank:$('#s2').value.trim(),acct:$('#s3').value.trim(),acctName:$('#s4').value.trim(),min:Number($('#s5').value)||300}).then(()=>{$('#sn').textContent=$('#s1').value;toast('Settings saved')});
+</script></body></html>

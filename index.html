@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SubTonic</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0a22;--card:#191236;--line:#2e2559;--tx:#f4f1ff;--mut:#a097cf;--a:#7c5cff;--a2:#22d3b6;--mtn:#ffcb05;--airtel:#ff2d3d;--glo:#2bd35a}
+*{box-sizing:border-box;margin:0}
+body{font-family:Sora,system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;line-height:1.5}
+button,input{font:inherit;color:inherit}
+.hide{display:none!important}
+input{width:100%;padding:14px 16px;border-radius:12px;border:1px solid var(--line);background:#120d2b;margin:6px 0 14px;outline:0}
+input:focus{border-color:var(--a)}
+label{font-size:13px;color:var(--mut)}
+.btn{border:0;border-radius:12px;padding:14px 20px;font-weight:600;cursor:pointer;background:linear-gradient(135deg,var(--a),#5b8cff);width:100%}
+.btn:disabled{opacity:.5}
+.btn.alt{background:var(--a2);color:#04231d}
+.btn.sm{width:auto;padding:8px 14px;font-size:13px}
+/* auth */
+#auth{min-height:100vh;display:grid;grid-template-columns:1.1fr 1fr}
+.hero{padding:56px;display:flex;flex-direction:column;justify-content:center;background:radial-gradient(circle at 20% 20%,#3b2a8f,transparent 55%),radial-gradient(circle at 90% 90%,#0d6b66,transparent 50%),#140e32}
+.hero h1{font-size:clamp(34px,5vw,60px);font-weight:800;line-height:1.05;letter-spacing:-1.5px}
+.hero p{color:var(--mut);margin-top:16px;max-width:420px}
+.chips{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.chip{padding:8px 16px;border-radius:99px;font-weight:600;font-size:14px;color:#111}
+.formside{display:flex;align-items:center;justify-content:center;padding:32px}
+.box{width:100%;max-width:400px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:32px}
+.box h2{font-size:26px;margin-bottom:4px}
+.tabs{display:flex;background:#120d2b;border-radius:12px;padding:4px;margin:20px 0}
+.tabs button{flex:1;border:0;background:0;padding:10px;border-radius:9px;color:var(--mut);cursor:pointer;font-weight:600}
+.tabs button.on{background:var(--a);color:#fff}
+.err{color:#ff7b8a;font-size:13px;min-height:20px;margin-bottom:8px}
+/* app */
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 5vw;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(14,10,34,.92);backdrop-filter:blur(10px);z-index:5}
+.logo{font-weight:800;font-size:22px;letter-spacing:-.5px}
+.logo b{color:var(--a2)}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 5vw 90px}
+.bal{background:linear-gradient(135deg,#4b34d8,#1b8f8a);border-radius:24px;padding:28px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.bal small{opacity:.8}.bal h2{font-size:clamp(30px,6vw,46px);font-weight:800}
+.bal .btn{width:auto;background:#fff;color:#241a63}
+nav{display:flex;gap:8px;margin:26px 0 18px;overflow-x:auto}
+nav button{border:1px solid var(--line);background:var(--card);padding:10px 20px;border-radius:99px;cursor:pointer;color:var(--mut);font-weight:600;white-space:nowrap}
+nav button.on{background:var(--a);color:#fff;border-color:var(--a)}
+.nets{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.net{border:2px solid var(--line);background:var(--card);border-radius:18px;padding:18px 8px;text-align:center;cursor:pointer;font-weight:800;font-size:18px}
+.net.on{border-color:var(--c);box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 22%,transparent)}
+.net i{display:block;width:34px;height:34px;border-radius:50%;background:var(--c);margin:0 auto 8px}
+.plans{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.plan{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;cursor:pointer;transition:.15s}
+.plan:hover,.plan.on{border-color:var(--a2);transform:translateY(-3px)}
+.plan.on{background:#1f1847}
+.plan h3{font-size:22px}.plan p{color:var(--mut);font-size:13px}.plan b{display:block;margin-top:10px;color:var(--a2)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;margin-top:20px;max-width:520px}
+.acct{background:#120d2b;border:1px dashed var(--a2);border-radius:14px;padding:16px;margin:14px 0;font-size:14px}
+.acct div{display:flex;justify-content:space-between;gap:10px;padding:4px 0}.acct span{color:var(--mut)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid var(--line);font-size:14px}
+.tag{padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;background:#3a2f70}
+.tag.approved,.tag.success{background:#0f5c43;color:#7dffc8}.tag.rejected,.tag.failed{background:#6a1d2b;color:#ffb3bd}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#fff;color:#1b1340;padding:12px 22px;border-radius:99px;font-weight:600;z-index:9;box-shadow:0 10px 30px #0008}
+@media(max-width:800px){#auth{grid-template-columns:1fr}.hero{padding:36px 24px}.formside{padding:20px}}
+</style></head><body>
+
+<section id="auth">
+ <div class="hero">
+  <div class="logo" style="font-size:28px;margin-bottom:36px"><span class="sn">SubTonic</span></div>
+  <h1>Cheap data. Instant delivery.</h1>
+  <p>Fund your wallet once and top up MTN, Airtel and Glo data in seconds, any time of day.</p>
+  <div class="chips"><span class="chip" style="background:var(--mtn)">MTN</span><span class="chip" style="background:var(--airtel);color:#fff">Airtel</span><span class="chip" style="background:var(--glo)">Glo</span></div>
+ </div>
+ <div class="formside"><div class="box">
+  <h2 id="at">Welcome back</h2><label>Log in to buy data</label>
+  <div class="tabs"><button id="tl" class="on">Log in</button><button id="ts">Sign up</button></div>
+  <div id="su" class="hide"><label>Full name</label><input id="nm" placeholder="e.g. Ade Bola"><label>Phone number</label><input id="ph" type="tel" placeholder="080..."></div>
+  <label>Email</label><input id="em" type="email" placeholder="you@email.com">
+  <label>Password</label><input id="pw" type="password" placeholder="At least 6 characters">
+  <div class="err" id="er"></div>
+  <button class="btn" id="go">Log in</button>
+ </div></div>
+</section>
+
+<section id="app" class="hide">
+ <header><div class="logo"><span class="sn">SubTonic</span></div><button class="btn sm" id="out" style="background:var(--card);border:1px solid var(--line)">Log out</button></header>
+ <div class="wrap">
+  <div class="bal"><div><small id="hi">Wallet balance</small><h2 id="bl">₦0</h2></div><button class="btn" onclick="tab('fund')">Fund wallet</button></div>
+  <nav><button data-t="buy" class="on">Buy data</button><button data-t="fund">Fund wallet</button><button data-t="hist">History</button></nav>
+
+  <div id="buy">
+   <div class="nets" id="nets"></div>
+   <div class="plans" id="plans"></div>
+   <div class="panel hide" id="pp"><label>Selected plan</label><h3 id="sel" style="margin:4px 0 14px"></h3>
+    <label>Phone number to receive data</label><input id="bp" type="tel" placeholder="080...">
+    <button class="btn alt" id="buyb">Buy now</button></div>
+  </div>
+
+  <div id="fund" class="hide"><div class="panel">
+   <h3>Add money</h3><label id="minl"></label>
+   <input id="am" type="number" placeholder="Amount in ₦" style="margin-top:10px">
+   <button class="btn" id="cont">Continue</button>
+   <div id="pay" class="hide">
+    <div class="acct"><div><span>Bank</span><b id="pb"></b></div><div><span>Account number</span><b id="pa"></b></div><div><span>Account name</span><b id="pn"></b></div><div><span>Amount</span><b id="pm"></b></div><div><span>Narration</span><b id="pr"></b></div></div>
+    <label>Transfer the exact amount and put the narration code in your transfer note. Then tap Done.</label><br><br>
+    <button class="btn alt" id="done">Done, I have paid</button>
+   </div>
+  </div></div>
+
+  <div id="hist" class="hide"><div class="panel" style="max-width:none" id="hl"></div></div>
+ </div>
+</section>
+<div id="toast" class="hide"></div>
+
+<script>
+var mode='login';
+function setMode(m){mode=m;var q=function(x){return document.querySelector(x)};q('#su').classList.toggle('hide',m=='login');q('#tl').classList.toggle('on',m=='login');q('#ts').classList.toggle('on',m!='login');q('#go').textContent=m=='login'?'Log in':'Create account';q('#at').textContent=m=='login'?'Welcome back':'Create your account'}
+document.getElementById('tl').onclick=function(){setMode('login')};
+document.getElementById('ts').onclick=function(){setMode('signup')};
+</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+// ====== PASTE YOUR FIREBASE CONFIG HERE ======
+const FIREBASE_CONFIG={apiKey:"AIzaSyC4xb59rh3GVEh9BEzOfF6CG5uu3VHv_Wg",authDomain:"pay-bfba2.firebaseapp.com",projectId:"pay-bfba2",storageBucket:"pay-bfba2.firebasestorage.app",messagingSenderId:"145331241096",appId:"1:145331241096:web:39bd6339ae2a8fdd5e5f3d"};
+// =============================================
+firebase.initializeApp(FIREBASE_CONFIG);
+const auth=firebase.auth(),db=firebase.firestore(),$=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const NETS={MTN:'var(--mtn)',Airtel:'var(--airtel)',Glo:'var(--glo)'};
+let S={name:'SubTonic',bank:'Opay',acct:'7037392295',acctName:'Edewor oritsegbemi ubido',min:300},U=null,me={},plans=[],net='MTN',pick=null,ref='',amt=0,unsubs=[],orders=[],deps=[];
+const ng=n=>'₦'+Number(n||0).toLocaleString();
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.remove('hide');setTimeout(()=>e.classList.add('hide'),3200)}
+function brand(){document.title=S.name;$$('.sn').forEach(e=>e.innerHTML=S.name.slice(0,-1)+'<b>'+S.name.slice(-1)+'</b>')}
+db.doc('settings/site').get().then(d=>{if(d.exists)S={...S,...d.data()};brand()}).catch(brand);brand();
+
+// auth
+$('#go').onclick=async()=>{const b=$('#go');$('#er').textContent='';b.disabled=true;
+ try{const e=$('#em').value.trim(),p=$('#pw').value;
+  if(mode=='login')await auth.signInWithEmailAndPassword(e,p);
+  else{const n=$('#nm').value.trim(),ph=$('#ph').value.trim();if(!n||!ph)throw{message:'Enter your name and phone number.'};
+   const c=await auth.createUserWithEmailAndPassword(e,p);
+   await db.doc('users/'+c.user.uid).set({name:n,phone:ph,email:e,balance:0,created:Date.now()})}
+ }catch(x){$('#er').textContent=(x.message||'Something went wrong').replace('Firebase: ','')}
+ b.disabled=false};
+$('#out').onclick=()=>auth.signOut();
+
+auth.onAuthStateChanged(u=>{unsubs.forEach(f=>f());unsubs=[];U=u;
+ $('#auth').classList.toggle('hide',!!u);$('#app').classList.toggle('hide',!u);if(!u)return;
+ unsubs.push(db.doc('users/'+u.uid).onSnapshot(d=>{me=d.data()||{};$('#bl').textContent=ng(me.balance);$('#hi').textContent='Hi '+(me.name||'').split(' ')[0]+', your balance'}));
+ unsubs.push(db.collection('plans').onSnapshot(s=>{plans=s.docs.map(d=>({id:d.id,...d.data()}));drawPlans()}));
+ unsubs.push(db.collection('orders').where('uid','==',u.uid).onSnapshot(s=>{orders=s.docs.map(d=>d.data());drawHist()}));
+ unsubs.push(db.collection('deposits').where('uid','==',u.uid).onSnapshot(s=>{deps=s.docs.map(d=>d.data());drawHist()}))});
+
+// nav
+function tab(t){['buy','fund','hist'].forEach(x=>$('#'+x).classList.toggle('hide',x!=t));$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t==t))}
+$$('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.t));
+
+// buy
+function drawPlans(){
+ $('#nets').innerHTML=Object.keys(NETS).map(n=>`<div class="net ${n==net?'on':''}" style="--c:${NETS[n]}" onclick="net='${n}';pick=null;drawPlans()"><i></i>${n}</div>`).join('');
+ const l=plans.filter(p=>p.network==net).sort((a,b)=>a.price-b.price);
+ $('#plans').innerHTML=l.length?l.map(p=>`<div class="plan ${pick&&pick.id==p.id?'on':''}" onclick="choose('${p.id}')"><h3>${p.name}</h3><p>${p.network} data</p><b>${ng(p.price)}</b></div>`).join(''):'<p style="color:var(--mut)">No '+net+' plans available right now.</p>';
+ $('#pp').classList.toggle('hide',!pick)}
+function choose(id){pick=plans.find(p=>p.id==id);$('#sel').textContent=pick.network+' '+pick.name+' - '+ng(pick.price);drawPlans()}
+$('#buyb').onclick=async()=>{const ph=$('#bp').value.trim();if(!/^0\d{10}$/.test(ph))return toast('Enter a valid 11-digit phone number');
+ const b=$('#buyb');b.disabled=true;
+ try{const uref=db.doc('users/'+U.uid),oref=db.collection('orders').doc();
+  await db.runTransaction(async t=>{const u=await t.get(uref);if((u.data().balance||0)<pick.price)throw{message:'Insufficient balance. Fund your wallet first.'};
+   t.update(uref,{balance:u.data().balance-pick.price});
+   t.set(oref,{uid:U.uid,email:U.email,network:pick.network,plan:pick.name,apiCode:pick.apiCode||'',phone:ph,price:pick.price,status:'processing',time:Date.now()})});
+  await sendToAPI({id:oref.id,network:pick.network,plan:pick.name,apiCode:pick.apiCode,phone:ph,price:pick.price});
+  toast('Order placed!');$('#bp').value='';pick=null;drawPlans()
+ }catch(e){toast(e.message||'Purchase failed')}b.disabled=false};
+
+// TODO: connect your data API here (waiting for API docs). On success set order status 'success', on failure refund the user and set 'failed'.
+async function sendToAPI(o){}
+
+// fund
+$('#cont').onclick=()=>{amt=Number($('#am').value);if(!amt||amt<S.min)return toast('Minimum deposit is '+ng(S.min));
+ ref='ST-'+Math.floor(1000+Math.random()*9000);
+ $('#pb').textContent=S.bank;$('#pa').textContent=S.acct;$('#pn').textContent=S.acctName;$('#pm').textContent=ng(amt);$('#pr').textContent=ref;$('#pay').classList.remove('hide')};
+$('#done').onclick=async()=>{const b=$('#done');b.disabled=true;
+ try{await db.collection('deposits').add({uid:U.uid,email:U.email,name:me.name||'',amount:amt,ref,status:'pending',time:Date.now()});
+  toast('Received. Your wallet updates once we confirm payment.');$('#pay').classList.add('hide');$('#am').value='';tab('hist')}catch(e){toast('Could not submit, try again')}b.disabled=false};
+
+// history
+function drawHist(){const a=[...orders.map(o=>({t:o.time,l:`${o.network} ${o.plan} to ${o.phone}`,v:'-'+ng(o.price),s:o.status})),...deps.map(d=>({t:d.time,l:`Deposit ${d.ref}`,v:'+'+ng(d.amount),s:d.status}))].sort((x,y)=>y.t-x.t);
+ $('#hl').innerHTML=a.length?a.map(x=>`<div class="row"><div>${x.l}<br><small style="color:var(--mut)">${new Date(x.t).toLocaleString()}</small></div><div style="text-align:right"><b>${x.v}</b><br><span class="tag ${x.s}">${x.s}</span></div></div>`).join(''):'<p style="color:var(--mut)">No transactions yet.</p>'}
+$('#minl').textContent='Minimum deposit: '+ng(S.min);db.doc('settings/site').get().then(()=>$('#minl').textContent='Minimum deposit: '+ng(S.min));
+</script></body></html>
